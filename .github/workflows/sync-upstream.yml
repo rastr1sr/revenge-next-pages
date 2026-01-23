@@ -1,0 +1,31 @@
+name: Sync upstream revenge-bundle-next
+
+on:
+  schedule:
+    - cron: "0 */3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout fork-meta
+        uses: actions/checkout@v4
+        with:
+          ref: fork-meta
+          fetch-depth: 0
+
+      - name: Fetch upstream into main
+        run: |
+          git remote add upstream https://github.com/revenge-mod/revenge-bundle-next.git || true
+          git fetch upstream
+
+          git checkout main
+          git merge upstream/main --ff-only || echo "Nothing to sync"
+
+      - name: Push main
+        run: git push origin main
