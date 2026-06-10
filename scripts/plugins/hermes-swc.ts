@@ -25,6 +25,7 @@ export default function hermesSwcPlugin(): RolldownPlugin {
                         // https://github.com/facebook/hermes/blob/main/doc/Features.md
                         targets: 'fully supports es6',
                         include: [
+                            'transform-arrow-functions',
                             'transform-async-generator-functions',
                             'transform-block-scoping',
                             'transform-classes',
