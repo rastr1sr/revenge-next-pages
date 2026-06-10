@@ -37,7 +37,7 @@ export default function RevengeDeveloperSettingScreen() {
                         containerStyle={listStyles.container}
                         node={{
                             type: 'list',
-                            ListHeaderComponent: DTAddrSetting,
+                            ListHeaderComponent: DTConnectionSetting,
                             sections: [
                                 {
                                     settings: [
@@ -83,37 +83,68 @@ export default function RevengeDeveloperSettingScreen() {
     )
 }
 
-export function DTAddrSetting() {
+export function DTConnectionSetting() {
     const open = useIsDTConnected()
-    const settings = api.storage.use(s => s.devTools?.address)
+    const settings = api.storage.use(
+        s =>
+            s.devTools?.address !== undefined ||
+            s.devTools?.alias !== undefined,
+    )
 
     return (
-        <Design.TextInput
-            defaultValue={settings?.devTools.address ?? DTContext.addr}
-            editable={!open}
-            isDisabled={open}
-            label="DevTools"
-            leadingText="ws://"
-            onBlur={() =>
-                api.storage
-                    .set({
-                        devTools: {
-                            address: DTContext.addr,
-                        },
-                    })
-                    .then(() =>
-                        ToastActionCreators.open({
-                            IconComponent: CircleCheckIcon,
-                            key: 'DEVTOOLS_ADDRESS_SAVED',
-                            content: 'Address saved',
-                        }),
-                    )
-            }
-            onChange={text => {
-                DTContext.addr = text
-            }}
-            returnKeyType="done"
-        />
+        <>
+            <Design.TextInput
+                defaultValue={settings?.devTools.address ?? DTContext.addr}
+                editable={!open}
+                isDisabled={open}
+                label="DevTools"
+                leadingText="ws://"
+                onBlur={() =>
+                    api.storage
+                        .set({
+                            devTools: {
+                                address: DTContext.addr,
+                            },
+                        })
+                        .then(() =>
+                            ToastActionCreators.open({
+                                IconComponent: CircleCheckIcon,
+                                key: 'DEVTOOLS_ADDRESS_SAVED',
+                                content: 'Address saved',
+                            }),
+                        )
+                }
+                onChange={text => {
+                    DTContext.addr = text
+                }}
+                returnKeyType="done"
+            />
+            <Design.TextInput
+                defaultValue={settings?.devTools.alias ?? DTContext.alias}
+                editable={!open}
+                isDisabled={open}
+                label="DevTools Alias"
+                onBlur={() =>
+                    api.storage
+                        .set({
+                            devTools: {
+                                alias: DTContext.alias,
+                            },
+                        })
+                        .then(() =>
+                            ToastActionCreators.open({
+                                IconComponent: CircleCheckIcon,
+                                key: 'DEVTOOLS_ALIAS_SAVED',
+                                content: 'Alias saved',
+                            }),
+                        )
+                }
+                onChange={text => {
+                    DTContext.alias = text
+                }}
+                returnKeyType="done"
+            />
+        </>
     )
 }
 

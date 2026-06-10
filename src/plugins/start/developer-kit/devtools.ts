@@ -15,10 +15,12 @@ import type { UnpatchFunction } from '@revenge-mod/patcher/types'
 export const DTContext: {
     client: DevToolsClient | null
     addr: string
+    alias: string
     con: boolean
 } = {
     client: null,
     addr: 'localhost:7684',
+    alias: '',
     con: false,
 }
 
@@ -77,6 +79,7 @@ export function connect() {
     client.connect(
         `ws://${DTContext.addr}`,
         `${Client.Version}${Bridge ? ` (${Bridge.name} ${Bridge.version})` : ''}`,
+        DTContext.alias || undefined,
     )
 
     const ws = client.ws!

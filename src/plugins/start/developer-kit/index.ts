@@ -12,7 +12,7 @@ import defer * as utils from './utils'
 import type { PluginApi } from '@revenge-mod/plugins/types'
 
 interface Storage {
-    devTools: DevToolsSettings
+    devTools: DevToolsSettings & { alias?: string }
     reactDevTools: DevToolsSettings
 }
 
