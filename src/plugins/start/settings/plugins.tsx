@@ -15,6 +15,9 @@ import type { StackScreenProps } from '@react-navigation/stack'
 import type { ReactNavigationParamList } from '@revenge-mod/externals/react-navigation'
 import type { PluginApi } from '@revenge-mod/plugins/types'
 
+const PluginsRequireReloadAlertKey = 'plugins-require-reload'
+const PluginsFailedToStartAlertKey = 'plugins-failed-to-start'
+
 /// SETTINGS ROUTES
 
 pEmitter.on('started', plugin => {
@@ -76,8 +79,9 @@ function showReloadRequiredAlertIfNeeded() {
 
     if (!plugins.length) return
 
+    AlertActionCreators.dismissAlert(PluginsRequireReloadAlertKey)
     AlertActionCreators.openAlert(
-        'plugins-require-reload',
+        PluginsRequireReloadAlertKey,
         <PluginsRequireReloadAlert plugins={plugins} />,
     )
 }
@@ -89,8 +93,9 @@ function showErrorAlertIfNeeded() {
 
     if (!plugins.length) return
 
+    AlertActionCreators.dismissAlert(PluginsFailedToStartAlertKey)
     AlertActionCreators.openAlert(
-        'plugins-failed-to-start',
+        PluginsFailedToStartAlertKey,
         <PluginsFailedToStartAlert plugins={plugins} />,
     )
 }
