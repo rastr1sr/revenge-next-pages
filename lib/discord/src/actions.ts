@@ -55,8 +55,10 @@ export let AlertActionCreators: DiscordModules.Actions.AlertActionCreators =
                 ).and(
                     withDependencies([
                         null,
-                        [relative(1), relative(2)],
+                        null,
                         [ReactNativeModuleId, ImportTrackerModuleId],
+                        relative(1),
+                        relative(2),
                         ImportTrackerModuleId,
                     ]),
                 ),
