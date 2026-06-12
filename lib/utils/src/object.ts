@@ -1,3 +1,4 @@
+import { asap } from '@revenge-mod/utils/callback'
 import { getCurrentStack } from './error'
 import type { AnyObject } from './types'
 
@@ -104,17 +105,32 @@ export function defineLazyProperties<T extends object>(
     return Object.defineProperties(target, descs)
 }
 
+// Fake symbol to represent uninitialized values in lazy properties.
+const UninitializedSymbol = {}
+
 function lazyPropDesc<T extends object, K extends keyof T>(
     key: K,
     loader: () => T[K],
 ): PropertyDescriptor {
     if (__BUILD_FLAG_DEBUG_LAZY_VALUES__) {
-        const value = loader()
-        if (value == null) DEBUG_warnNullishLazyValue(key)
+        let val: unknown | typeof UninitializedSymbol = UninitializedSymbol
+        const getOrLoadVal = () => {
+            try {
+                if (val === UninitializedSymbol) val = loader()
+                return val
+            } catch (error) {
+                DEBUG_warnFaultyLazyLoader(key, error)
+                val = null
+            }
+        }
+
+        asap(() => {
+            if (getOrLoadVal() == null) DEBUG_warnNullishLazyValue(key)
+        })
 
         return {
             configurable: true,
-            value,
+            get: getOrLoadVal,
         }
     }
 
@@ -130,6 +146,13 @@ function lazyPropDesc<T extends object, K extends keyof T>(
 function DEBUG_warnNullishLazyValue(key: PropertyKey) {
     nativeLoggingHook(
         `\u001b[33mLazy property ${String(key)} is being initialized to a nullish value:\n${getCurrentStack()}\u001b[0m`,
+        2,
+    )
+}
+
+function DEBUG_warnFaultyLazyLoader(key: PropertyKey, error: unknown) {
+    nativeLoggingHook(
+        `\u001b[31mLazy property ${String(key)} threw an error during loading:\n${getCurrentStack()}\u001b[0m\nError: ${error}`,
         2,
     )
 }
